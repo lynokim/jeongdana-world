@@ -881,3 +881,50 @@ footer {
         opacity: 0;
     }
 }
+/* 📱 모바일 반응형 스타일 */
+@media screen and (max-width: 600px) {
+  .search-bar {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .search-bar input {
+    width: 90vw;
+    font-size: 1rem;
+  }
+
+  .search-bar button {
+    width: 60px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .floating-bubble {
+    font-size: 0.9rem;
+    transform: translateX(-50%) translateY(-40px);
+  }
+
+  .floating-heart {
+    font-size: 1.1rem;
+  }
+
+  .heart-snow {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  header h1 {
+    font-size: 1.3rem;
+    text-align: center;
+  }
+
+  nav ul {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr; /* 세로 한줄씩 */
+  }
+}
