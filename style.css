@@ -123,6 +123,8 @@ header h1 {
     box-sizing: border-box;
     cursor: pointer;
     transition: transform 0.2s ease;
+    position: relative; /* 자식인 heart-pop의 기준 */
+    overflow: visible; /* 하트가 밖으로 나올 수 있게 */
 }
 
 .search-bar button i {
@@ -177,9 +179,15 @@ nav ul li a:hover {
     color: #ff6688;
 }
 
-nav ul li a:hover::after {
+nav ul li a:hover::after,
+nav ul li a[aria-current="page"]::after { /* 현재 페이지 링크에도 밑줄 표시 */
     width: 100%;
 }
+nav ul li a[aria-current="page"] {
+    color: #ff6688; /* 현재 페이지 링크 색상 강조 */
+    font-weight: 700;
+}
+
 
 /* --- 섹션 제목 공통 스타일 --- */
 h2 {
@@ -413,44 +421,164 @@ footer {
     color: #ff6688;
 }
 
+/* 하트 애니메이션 요소 숨김 기본 상태 */
+.heart-pop {
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0;
+    transform: scale(0);
+    animation: none;
+    pointer-events: none;
+}
 
-/* --- 반응형 디자인을 위한 미디어 쿼리 (심화) --- */
+/* 뿅 애니메이션 클래스 */
+.heart-pop.show {
+    animation: heart-pop 0.6s ease-out;
+}
+
+@keyframes heart-pop {
+    0% {
+        opacity: 0; /* 시작시 투명 */
+        transform: scale(0.5) translateY(0);
+    }
+    50% {
+        transform: scale(1.6) translateY(-15px);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.5) translateY(-25px);
+        opacity: 0;
+    }
+}
+
+/* 하트 뿅뿅 애니메이션 */
+.floating-heart {
+    position: absolute;
+    font-size: 1.2rem;
+    pointer-events: none;
+    opacity: 0;
+    animation: float-up 1s ease-out forwards;
+    z-index: 999;
+}
+
+@keyframes float-up {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(0.8);
+    }
+    50% {
+        transform: translateY(-30px) scale(1.5);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-60px) scale(0.4);
+        opacity: 0;
+    }
+}
+
+/* 말풍선 애니메이션 */
+.floating-bubble {
+    font-size: 0.95rem;
+    background-color: #fff0f5;
+    color: #ff5e88;
+    padding: 6px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(255, 153, 170, 0.2);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    animation: float-up-bubble 1.2s ease-out forwards;
+    z-index: 9999;
+    transform: translateX(-50%);
+}
+
+@keyframes float-up-bubble {
+    0% {
+        opacity: 0; /* 시작시 투명 */
+        transform: translateX(-50%) translateY(10px) scale(0.9);
+    }
+    40% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1.05);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px) scale(0.9);
+    }
+}
+
+/* 하트 스노우 컨테이너 */
+.heart-snow-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.heart-snow {
+    position: absolute;
+    top: -2rem;
+    color: #ff88aa;
+    opacity: 0.8;
+    animation: fall linear infinite;
+    font-size: 1.2rem;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-5vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* --- 반응형 디자인을 위한 미디어 쿼리 --- */
 
 /* 태블릿 (가로) 및 작은 데스크톱 (991px 이하) */
 @media (max-width: 991px) {
     .container {
-        padding: 0 18px; /* 컨테이너 좌우 패딩 약간 줄임 */
+        padding: 0 18px;
     }
 
     .header-top {
-        flex-direction: column; /* 헤더 요소 세로 정렬 */
+        flex-direction: column;
         align-items: center;
         margin-bottom: 20px;
     }
 
     header h1 {
-        font-size: 2.2rem; /* 제목 크기 조정 */
-        margin-bottom: 15px; /* 제목 아래 여백 추가 */
+        font-size: 2.2rem;
+        margin-bottom: 15px;
     }
 
     .search-bar {
-        width: 80%; /* 검색창 너비 조정 */
-        max-width: 350px; /* 최대 너비 지정 */
-        height: 45px; /* 높이 약간 조정 */
+        width: 80%;
+        max-width: 350px;
+        height: 45px;
     }
     .search-bar input {
-        line-height: 45px; /* input 줄 높이 조정 */
+        line-height: 45px;
     }
 
     nav ul {
-        flex-wrap: wrap; /* 메뉴 항목 줄 바꿈 허용 */
+        flex-wrap: wrap;
         justify-content: center;
     }
     nav ul li {
-        margin: 0 12px; /* 메뉴 항목 간격 조정 */
+        margin: 0 12px;
     }
     nav ul li a {
-        font-size: 1rem; /* 메뉴 폰트 크기 조정 */
+        font-size: 1rem;
         padding: 6px 0;
     }
     nav ul li a::after {
@@ -458,7 +586,7 @@ footer {
     }
 
     h2 {
-        font-size: 2.4rem; /* 섹션 제목 크기 조정 */
+        font-size: 2.4rem;
         margin-bottom: 40px;
     }
     h2::after {
@@ -467,30 +595,30 @@ footer {
     }
 
     p {
-        font-size: 1.05rem; /* 단락 폰트 크기 조정 */
+        font-size: 1.05rem;
         max-width: 700px;
         margin-bottom: 30px;
     }
 
     button {
-        padding: 12px 28px; /* 버튼 패딩 조정 */
+        padding: 12px 28px;
         font-size: 1.1rem;
     }
 
     .card-section {
-        padding: 50px 0; /* 섹션 패딩 조정 */
+        padding: 50px 0;
         margin-bottom: 25px;
     }
 
     .feature-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* 그리드 아이템 최소 너비 조정 */
-        gap: 25px; /* 그리드 간격 조정 */
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
     }
     .feature-item {
-        padding: 30px; /* 기능 아이템 패딩 조정 */
+        padding: 30px;
     }
     .feature-item .icon-large {
-        font-size: 3.5rem; /* 아이콘 크기 조정 */
+        font-size: 3.5rem;
         margin-bottom: 20px;
     }
     .feature-item h3 {
@@ -501,9 +629,9 @@ footer {
     }
 
     .news-grid {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 뉴스 아이템 최소 너비 조정 */
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 20px;
-        max-width: 600px; /* 2열일 때 최대 너비 */
+        max-width: 600px;
         margin-left: auto;
         margin-right: auto;
     }
@@ -535,49 +663,48 @@ footer {
 /* 모바일 (세로) 및 아주 작은 태블릿 (767px 이하) */
 @media (max-width: 767px) {
     .container {
-        padding: 0 15px; /* 컨테이너 좌우 패딩 더 줄임 */
+        padding: 0 15px;
     }
 
     header {
         padding: 20px 0;
     }
     header h1 {
-        font-size: 1.8rem; /* 제목 크기 더 줄임 */
+        font-size: 1.8rem;
         margin-bottom: 10px;
     }
 
     .search-bar {
-        width: 95%; /* 모바일에서 검색창 너비 거의 꽉 채움 */
-        height: 42px; /* 모바일 검색창 높이 조정 */
+        width: 95%;
+        height: 42px;
     }
     .search-bar input {
         font-size: 0.9rem;
         padding: 0 15px;
-        line-height: 42px; /* input 줄 높이 조정 */
+        line-height: 42px;
     }
     .search-bar button {
         font-size: 1rem;
-        padding: 0 15px;
     }
 
     nav ul {
-        flex-direction: column; /* 메뉴 항목을 세로로 정렬 */
-        align-items: center; /* 세로 정렬 시 가운데 */
+        flex-direction: column;
+        align-items: center;
         margin-top: 15px;
     }
     nav ul li {
-        margin: 8px 0; /* 세로 정렬 시 항목 간격 */
+        margin: 8px 0;
     }
     nav ul li a {
         font-size: 1rem;
         padding: 5px 0;
     }
     nav ul li a::after {
-        display: none; /* 모바일에서 메뉴 밑줄 숨김 */
+        display: none;
     }
 
     h2 {
-        font-size: 2rem; /* 섹션 제목 크기 더 줄임 */
+        font-size: 2rem;
         margin-bottom: 30px;
     }
     h2::after {
@@ -587,12 +714,12 @@ footer {
     }
 
     p {
-        font-size: 0.95rem; /* 단락 폰트 크기 더 줄임 */
+        font-size: 0.95rem;
         margin-bottom: 25px;
     }
 
     button {
-        width: 90%; /* 버튼 너비 거의 꽉 채움 */
+        width: 90%;
         padding: 10px 25px;
         font-size: 1rem;
     }
@@ -603,10 +730,10 @@ footer {
     }
 
     .feature-grid, .news-grid {
-        grid-template-columns: 1fr; /* 모바일에서 1열로 변경 */
+        grid-template-columns: 1fr;
         gap: 20px;
         margin-top: 40px;
-        max-width: 350px; /* 1열일 때 최대 너비 (컨테이너 패딩 고려) */
+        max-width: 350px;
         margin-left: auto;
         margin-right: auto;
     }
@@ -646,22 +773,35 @@ footer {
     }
 }
 
-/* 아주 작은 모바일 (480px 이하) - 선택 사항 */
+/* 아주 작은 모바일 (480px 이하) */
 @media (max-width: 480px) {
     header h1 {
         font-size: 1.6rem;
     }
     .search-bar {
         height: 40px;
+        flex-direction: row; /* 검색바를 다시 가로로 */
+        align-items: center;
+        justify-content: space-between;
+        width: 90vw;
+        padding: 0.4rem 0.5rem;
+        gap: 8px;
+        box-sizing: border-box;
     }
     .search-bar input {
         line-height: 40px;
         font-size: 0.85rem;
         padding: 0 12px;
+        flex: 1;
+        border-radius: 999px; /* 모바일에서 둥근 인풋 필드 */
     }
     .search-bar button {
+        width: 48px;
+        height: 48px;
         font-size: 0.9rem;
-        padding: 0 12px;
+        padding: 0; /* 버튼 패딩 제거 */
+        border-radius: 50%; /* 버튼을 원형으로 */
+        flex-shrink: 0;
     }
     nav ul li a {
         font-size: 0.9rem;
@@ -690,303 +830,15 @@ footer {
     .news-item {
         padding: 15px;
     }
-}
-/* 하트 애니메이션 요소 숨김 기본 상태 */
-.heart-pop {
-    position: absolute;
-    font-size: 1.5rem;
-    opacity: 0;
-    transform: scale(0);
-    animation: none;
-    pointer-events: none;
-}
-
-/* 버튼 내 하트 위치 정렬 */
-.search-bar button {
-    position: relative; /* 자식인 heart-pop의 기준 */
-    overflow: visible; /* 하트가 밖으로 나올 수 있게 */
-}
-
-/* 뿅 애니메이션 클래스 */
-.heart-pop.show {
-    animation: heart-pop 0.6s ease-out;
-}
-
-@keyframes heart-pop {
-    0% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
+    .floating-bubble {
+        font-size: 0.8rem;
+        transform: translateX(-50%) translateY(-40px);
     }
-    50% {
-        transform: scale(1.6) translateY(-15px);
-        opacity: 1;
+    .floating-heart {
+        font-size: 1.1rem;
     }
-    100% {
-        transform: scale(0.5) translateY(-25px);
-        opacity: 0;
+    .heart-snow {
+        font-size: 0.8rem;
+        opacity: 0.7;
     }
-}
-.floating-heart {
-    position: absolute;
-    font-size: 1.2rem;
-    pointer-events: none;
-    opacity: 0;
-    animation: float-up 1s ease-out forwards;
-    z-index: 999;
-}
-
-@keyframes float-up {
-    0% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-    50% {
-        transform: translateY(-30px) scale(1.5);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-60px) scale(0.5);
-        opacity: 0;
-    }
-}
-.speech-bubble {
-    position: absolute;
-    bottom: 60px; /* 버튼 위로 */
-    left: 50%;
-    transform: translateX(-50%);
-    background: #fff0f5;
-    color: #ff6699;
-    padding: 10px 18px;
-    border-radius: 18px;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: 'Noto Sans KR', sans-serif;
-    box-shadow: 0 4px 12px rgba(255, 102, 153, 0.2);
-    animation: bubble-pop 1.2s ease-out forwards;
-    white-space: nowrap;
-    z-index: 1000;
-}
-
-.speech-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 8px;
-    border-style: solid;
-    border-color: #fff0f5 transparent transparent transparent;
-}
-
-@keyframes bubble-pop {
-    0% {
-        opacity: 0;
-        transform: translateX(-50%) translateY(10px) scale(0.9);
-    }
-    40% {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0) scale(1.05);
-    }
-    100% {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-10px) scale(0.9);
-    }
-}
-/* 하트 뿅뿅 애니메이션 */
-.floating-heart {
-    position: absolute;
-    font-size: 1.2rem;
-    pointer-events: none;
-    opacity: 0;
-    animation: float-up 1s ease-out forwards;
-    z-index: 999;
-}
-
-/* 말풍선 애니메이션 */
-.floating-bubble {
-    font-size: 0.95rem;
-    background-color: #fff0f5;
-    color: #ff5e88;
-    padding: 6px 12px;
-    border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(255, 153, 170, 0.2);
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    animation: float-up-bubble 1.2s ease-out forwards;
-    z-index: 9999;
-    transform: translateX(-50%);
-}
-
-/* 공통 애니메이션 */
-@keyframes float-up {
-    0% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-    50% {
-        transform: translateY(-30px) scale(1.6);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-60px) scale(0.4);
-        opacity: 0;
-    }
-}
-
-@keyframes float-up-bubble {
-    0% {
-        opacity: 1;
-        transform: translateY(0) scale(0.9);
-    }
-    40% {
-        transform: translateY(-20px) scale(1.1);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-60px) scale(1);
-        opacity: 0;
-    }
-}
-.heart-snow-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 1;
-}
-
-.heart-snow {
-    position: absolute;
-    top: -2rem;
-    color: #ff88aa;
-    opacity: 0.8;
-    animation: fall linear infinite;
-    font-size: 1.2rem;
-}
-
-@keyframes fall {
-    0% {
-        transform: translateY(-5vh) rotate(0deg);
-        opacity: 0;
-    }
-    10% {
-        opacity: 0.8;
-    }
-    100% {
-        transform: translateY(110vh) rotate(360deg);
-        opacity: 0;
-    }
-}
-/* 📱 모바일 반응형 스타일 */
-@media screen and (max-width: 600px) {
-  .search-bar {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .search-bar input {
-    width: 90vw;
-    font-size: 1rem;
-  }
-
-  .search-bar button {
-    width: 60px;
-    height: 40px;
-    font-size: 1.2rem;
-  }
-
-  .floating-bubble {
-    font-size: 0.9rem;
-    transform: translateX(-50%) translateY(-40px);
-  }
-
-  .floating-heart {
-    font-size: 1.1rem;
-  }
-
-  .heart-snow {
-    font-size: 0.8rem;
-    opacity: 0.7;
-  }
-
-  header h1 {
-    font-size: 1.3rem;
-    text-align: center;
-  }
-
-  nav ul {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .feature-grid {
-    grid-template-columns: 1fr; /* 세로 한줄씩 */
-  }
-}
-@media screen and (max-width: 480px) {
-  .search-bar {
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .search-bar input {
-    width: 90vw;
-    font-size: 1rem;
-    padding: 0.6rem 1rem;
-  }
-
-  .search-bar button {
-    width: 60px;
-    height: 44px;
-    font-size: 1.2rem;
-    border-radius: 22px;
-  }
-
-  .floating-bubble {
-    font-size: 0.8rem;
-    transform: translateX(-50%) translateY(-40px);
-  }
-
-  header h1 {
-    font-size: 1.4rem;
-    text-align: center;
-  }
-}
-@media screen and (max-width: 480px) {
-  .search-bar {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    width: 90vw;
-    padding: 0.4rem 0.5rem;
-    gap: 8px;
-    box-sizing: border-box;
-  }
-
-  .search-bar input {
-    flex: 1;
-    font-size: 1rem;
-    padding: 0.6rem 1rem;
-    border-radius: 999px;
-    border: none;
-    outline: none;
-    background: transparent;
-  }
-
-  .search-bar button {
-    width: 48px;
-    height: 48px;
-    font-size: 1.2rem;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
 }
