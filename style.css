@@ -77,55 +77,62 @@ header h1 {
     letter-spacing: -0.5px;
 }
 
-/* 검색창 스타일 (수정된 최종 버전) */
+/* 🧡 귀엽게 바꾼 검색창 스타일 */
 .search-bar {
     display: flex;
-    align-items: center; /* 세로 중앙 정렬 */
-    border: 2px solid #ff99aa;
-    border-radius: 30px;
+    align-items: stretch; /* 모든 내부 요소 높이 100%로 고정 */
+    border: 3px dashed #ffb6c1;
+    border-radius: 40px;
     overflow: hidden;
-    width: 320px;
-    box-shadow: 0 2px 8px rgba(255, 153, 170, 0.3);
-    height: 48px; /* 명확한 높이 지정 */
+    width: 360px;
+    height: 52px;
+    background: linear-gradient(145deg, #ffe6ec, #fff0f5);
+    box-shadow: 0 6px 18px rgba(255, 182, 193, 0.4);
 }
 
 .search-bar input {
+    flex: 1;
     border: none;
-    padding: 0 18px; /* 상하 패딩 0 */
-    flex-grow: 1;
+    padding: 0 20px;
     font-size: 1rem;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: transparent;
     outline: none;
-    box-sizing: border-box;
     height: 100%;
-    line-height: 48px; /* input 텍스트의 줄 높이를 부모 height와 동일하게 */
+    line-height: 52px; /* 줄 높이 맞추기 */
+    box-sizing: border-box;
     color: #4a4a4a;
 }
 
 .search-bar input::placeholder {
-    color: #b0b0b0;
+    color: #c88a9f;
+    font-style: italic;
 }
 
 .search-bar button {
-    background-color: #ff99aa;
-    color: white;
+    width: 58px;
+    height: 100%;
+    background: linear-gradient(to right, #ff99aa, #ff7799);
     border: none;
-    padding: 0 18px; /* 상하 패딩 0 */
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
-    border-radius: 0 30px 30px 0;
+    border-radius: 0 40px 40px 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
+    margin: 0;
     box-sizing: border-box;
-    height: 100%;
-    line-height: 1; /* 버튼 아이콘 줄 높이 초기화 */
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.search-bar button i {
+    font-size: 1.2rem;
+    color: white;
+    pointer-events: none;
 }
 
 .search-bar button:hover {
-    background-color: #ff6688;
-    transform: none;
-    box-shadow: none;
+    transform: scale(1.05);
 }
 
 /* --- 내비게이션 스타일 --- */
@@ -682,5 +689,195 @@ footer {
     }
     .news-item {
         padding: 15px;
+    }
+}
+/* 하트 애니메이션 요소 숨김 기본 상태 */
+.heart-pop {
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0;
+    transform: scale(0);
+    animation: none;
+    pointer-events: none;
+}
+
+/* 버튼 내 하트 위치 정렬 */
+.search-bar button {
+    position: relative; /* 자식인 heart-pop의 기준 */
+    overflow: visible; /* 하트가 밖으로 나올 수 있게 */
+}
+
+/* 뿅 애니메이션 클래스 */
+.heart-pop.show {
+    animation: heart-pop 0.6s ease-out;
+}
+
+@keyframes heart-pop {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    50% {
+        transform: scale(1.6) translateY(-15px);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.5) translateY(-25px);
+        opacity: 0;
+    }
+}
+.floating-heart {
+    position: absolute;
+    font-size: 1.2rem;
+    pointer-events: none;
+    opacity: 0;
+    animation: float-up 1s ease-out forwards;
+    z-index: 999;
+}
+
+@keyframes float-up {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-30px) scale(1.5);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-60px) scale(0.5);
+        opacity: 0;
+    }
+}
+.speech-bubble {
+    position: absolute;
+    bottom: 60px; /* 버튼 위로 */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff0f5;
+    color: #ff6699;
+    padding: 10px 18px;
+    border-radius: 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Noto Sans KR', sans-serif;
+    box-shadow: 0 4px 12px rgba(255, 102, 153, 0.2);
+    animation: bubble-pop 1.2s ease-out forwards;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+.speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px;
+    border-style: solid;
+    border-color: #fff0f5 transparent transparent transparent;
+}
+
+@keyframes bubble-pop {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px) scale(0.9);
+    }
+    40% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1.05);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px) scale(0.9);
+    }
+}
+/* 하트 뿅뿅 애니메이션 */
+.floating-heart {
+    position: absolute;
+    font-size: 1.2rem;
+    pointer-events: none;
+    opacity: 0;
+    animation: float-up 1s ease-out forwards;
+    z-index: 999;
+}
+
+/* 말풍선 애니메이션 */
+.floating-bubble {
+    font-size: 0.95rem;
+    background-color: #fff0f5;
+    color: #ff5e88;
+    padding: 6px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(255, 153, 170, 0.2);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    animation: float-up-bubble 1.2s ease-out forwards;
+    z-index: 9999;
+    transform: translateX(-50%);
+}
+
+/* 공통 애니메이션 */
+@keyframes float-up {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-30px) scale(1.6);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-60px) scale(0.4);
+        opacity: 0;
+    }
+}
+
+@keyframes float-up-bubble {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(0.9);
+    }
+    40% {
+        transform: translateY(-20px) scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-60px) scale(1);
+        opacity: 0;
+    }
+}
+.heart-snow-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.heart-snow {
+    position: absolute;
+    top: -2rem;
+    color: #ff88aa;
+    opacity: 0.8;
+    animation: fall linear infinite;
+    font-size: 1.2rem;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-5vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
     }
 }
