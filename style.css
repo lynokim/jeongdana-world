@@ -477,14 +477,12 @@ button:disabled {
     100% { transform: translateY(100vh) translateX(var(--end-x, 0)); opacity: 0; } /* 화면 아래로 떨어지며 사라짐 */
 }
 
-/* --- 사다리 게임 스타일 --- */
+/* --- 사다리 게임 스타일 (네이버 구조) --- */
 #ladder-section {
-    font-family: 'Cafe24 Ssurround', 'SUIT', 'Pretendard', sans-serif;
     background-color: #fff0f5; /* 연한 분홍 배경 */
     border-top: 5px dashed #ff99cc; /* 대시 라인 상단 테두리 */
-    padding: 40px;
+    padding: 20px;
     text-align: center;
-    overflow-x: auto; /* 내용이 넘칠 경우 스크롤바 생성 */
 }
 
 #ladder-section h2 {
@@ -492,10 +490,11 @@ button:disabled {
 }
 
 .ladder-controls {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     display: flex;
     justify-content: center;
-    gap: 15px;
+    align-items: center;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
@@ -503,152 +502,127 @@ button:disabled {
     font-size: 1.1rem;
     font-weight: bold;
     color: #ff69b4;
-    margin-right: 10px;
 }
 
-.input-count-display {
-    display: inline-block;
-    background-color: #ffecf2;
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-weight: bold;
-    color: #ff69b4;
-    margin-left: 5px;
-}
-
-.ladder-main {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 20px;
-    flex-wrap: wrap; /* 반응형을 위해 */
-}
-
-.ladder-sidebar {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    width: 250px;
-    flex-shrink: 0; /* 줄어들지 않게 */
-}
-
-.ladder-sidebar h3 {
-    font-family: 'Jua', sans-serif;
-    color: #ff69b4;
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.3rem;
-}
-
-.ladder-sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    text-align: left;
-}
-
-.ladder-sidebar li {
-    margin-bottom: 10px;
-}
-
-.ladder-sidebar input[type="text"] {
-    width: calc(100% - 20px); /* 패딩 고려 */
-    padding: 8px 10px;
-    border: 1px solid #ffccdd;
+.ladder-controls input[type="number"] {
+    width: 60px;
+    padding: 8px;
+    border: 2px solid #ffccdd;
     border-radius: 8px;
-    font-family: 'Noto Sans KR', sans-serif;
+    text-align: center;
     font-size: 1rem;
-    transition: border-color 0.2s ease;
+    font-weight: bold;
 }
-
-.ladder-sidebar input[type="text"]:focus {
+.ladder-controls input[type="number"]:focus {
     outline: none;
     border-color: #ff99cc;
     box-shadow: 0 0 5px rgba(255, 153, 204, 0.5);
 }
 
-.ladder-buttons {
-    margin-top: 20px;
+.ladder-controls button {
+    padding: 10px 20px;
+    font-size: 1rem;
+}
+
+.ladder-main-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.ladder-input-group {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+    margin-bottom: 5px;
+    min-width: 500px;
+}
+
+#player-inputs {
+    margin-bottom: 10px;
+}
+
+#outcome-inputs {
+    margin-top: 10px;
+}
+
+.ladder-input-group .input-wrapper {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    align-items: center;
 }
 
-.ladder-canvas-container {
-    position: relative; /* 사다리 시작 버튼과 블라인드 오버레이를 위해 */
-    background-color: #fff;
-    border: 2px solid #ffccdd;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    flex-grow: 1; /* 남은 공간 채우기 */
-    min-width: 300px; /* 최소 너비 */
-    padding: 20px; /* 캔버스 주변 여백 */
-    display: flex; /* 캔버스 중앙 정렬용 */
-    justify-content: center; /* 캔버스 중앙 정렬용 */
-    align-items: center; /* 캔버스 중앙 정렬용 */
+.ladder-input-group input[type="text"],
+.ladder-input-group .result-display {
+    width: 100%;
+    max-width: 120px;
+    padding: 8px;
+    border: 1px solid #ffccdd;
+    border-radius: 8px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.9rem;
+    text-align: center;
+    box-sizing: border-box;
+}
+.ladder-input-group input[type="text"]:focus {
+    outline: none;
+    border-color: #ff99cc;
 }
 
-#ladderCanvas {
-    display: block; /* 불필요한 여백 제거 */
-    background-color: #fdfdfd; /* 캔버스 배경 */
-    border-radius: 10px;
-    max-width: 100%; /* 반응형 */
-    height: 400px; /* 높이 고정 */
-    transition: opacity 0.5s ease-in-out; /* 블라인드 효과 트랜지션 */
-}
-
-/* 🚩 사다리 블라인드 효과 */
-#ladderCanvas.blind {
-    opacity: 0.1; /* 거의 보이지 않게 */
-    /* background-color: rgba(255, 240, 245, 0.9); /* 블라인드 처리될 때 배경색 */
-}
-
-.ladder-start-button {
-    position: absolute;
-    /* top, left는 script.js에서 동적으로 설정 */
-    transform: translateX(-50%); /* 정확한 중앙 정렬 */
-    background-color: #ff99cc;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-family: 'Cafe24 Ssurround', sans-serif;
-    font-size: 1.1rem;
+/* Player input을 클릭 가능하게 보이도록 스타일 변경 */
+#player-inputs input[type="text"] {
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    transition: all 0.2s ease, background-color 0.3s;
-    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
-}
-
-.ladder-start-button:hover {
-    background-color: #ff69b4;
-    transform: translateX(-50%) translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-}
-
-/* 👆 클릭 모션 */
-.ladder-start-button.clicked-effect {
-    animation: buttonClick 0.3s ease;
-    background-color: #ff4d94; /* 클릭 시 더 진한 색 */
-    transform: translateX(-50%) scale(0.95);
-}
-
-@keyframes buttonClick {
-    0% { transform: translateX(-50%) scale(1); }
-    50% { transform: translateX(-50%) scale(0.9); }
-    100% { transform: translateX(-50%) scale(1); }
-}
-
-#ladder-result {
-    margin-top: 30px;
-    font-size: 1.6rem;
     font-weight: bold;
-    color: #ff69b4;
-    min-height: 2em; /* 결과가 없어도 공간 유지 */
-    opacity: 0; /* 초기 숨김 */
-    transition: opacity 0.5s ease-out;
+    color: #d81b60;
+    transition: background-color 0.2s;
 }
+#player-inputs input[type="text"]:hover {
+    background-color: #fff9f8;
+}
+
+/* 결과 표시 영역 */
+#outcome-results {
+    margin-top: 5px;
+    min-height: 40px; /* 결과 표시될 공간 확보 */
+}
+.result-display {
+    background-color: #ffecf2;
+    color: #ff69b4;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden; /* 초기에는 숨김 */
+}
+.result-display.visible {
+    visibility: visible;
+}
+
+
+.ladder-canvas-wrapper {
+    position: relative;
+    width: 100%;
+    min-width: 500px; /* 최소 너비 지정 */
+    height: 450px; /* 높이 고정 */
+    margin: 0 auto;
+}
+
+#ladderCanvas, #animationCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+#animationCanvas {
+    pointer-events: none; /* 애니메이션 캔버스는 클릭 이벤트를 받지 않도록 설정 */
+}
+
 
 /* --- 미디어 쿼리 (반응형 디자인) --- */
 @media (max-width: 768px) {
@@ -681,22 +655,6 @@ button:disabled {
 
     .features-grid {
         grid-template-columns: 1fr; /* 한 줄에 하나씩 */
-    }
-
-    .ladder-main {
-        flex-direction: column; /* 세로로 쌓기 */
-        align-items: center;
-    }
-
-    .ladder-sidebar {
-        width: 90%;
-        max-width: 400px; /* 최대 너비 제한 */
-    }
-
-    .ladder-canvas-container {
-        width: 100%; /* 컨테이너가 가로로 가득 차도록 */
-        min-width: unset;
-        box-sizing: border-box; /* 패딩 포함 너비 계산 */
     }
 }
 
@@ -762,180 +720,17 @@ button:disabled {
         opacity: 0.7;
     }
     #ladder-section {
-        padding: 20px;
-    }
-    .ladder-sidebar {
-        width: 100%;
         padding: 15px;
     }
-    .ladder-sidebar h3 {
-        font-size: 1.2rem;
+    .ladder-controls {
+        gap: 5px;
     }
-    .ladder-sidebar input[type="text"] {
-        padding: 7px 8px;
-        font-size: 0.9rem;
-    }
-    .ladder-start-button {
-        font-size: 1rem;
-        padding: 6px 12px;
-    }
-    #ladder-result {
-        font-size: 1.4rem;
-    }
-}
-#모바일 호환성 문제 개선
-/* 기본 레이아웃 */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif; /* 더 범용적인 폰트 사용 권장 */
-}
-
-.ladder-game-container {
-    max-width: 100%; /* 부모 컨테이너의 최대 너비 설정 */
-    overflow-x: auto; /* 캔버스 너비가 뷰포트를 초과할 경우 스크롤 허용 */
-    -webkit-overflow-scrolling: touch; /* iOS 스크롤 부드럽게 */
-    margin: 20px auto;
-    padding: 10px;
-    box-sizing: border-box;
-}
-
-#ladderCanvas {
-    display: block; /* 캔버스 하단 여백 제거 */
-    margin: 0 auto;
-    /* max-width: 100%; 는 canvas 엘리먼트에는 직접 적용되지 않음. JS에서 너비 조절 */
-    /* Height는 JS에서 고정. 필요시 max-height 설정 */
-}
-
-/* 참가자 및 결과 입력창 반응형 */
-.input-section ul {
-    display: flex;
-    flex-wrap: wrap; /* 작은 화면에서 항목이 다음 줄로 넘어가도록 */
-    justify-content: center;
-    padding: 0;
-    list-style: none;
-}
-
-.input-section li {
-    flex: 1 1 auto; /* 유연하게 공간 차지, 최소 너비는 콘텐츠에 맞게 */
-    min-width: 120px; /* 각 입력 필드의 최소 너비 설정 */
-    margin: 5px;
-    box-sizing: border-box;
-}
-
-.input-section input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-    font-size: 1rem;
-}
-
-/* 버튼 그룹 */
-.button-group {
-    display: flex;
-    justify-content: center;
-    gap: 10px; /* 버튼 사이 간격 */
-    margin-top: 20px;
-    flex-wrap: wrap; /* 모바일에서 버튼이 다음 줄로 넘어가도록 */
-}
-
-.button-group button,
-.ladder-start-button {
-    padding: 10px 15px;
-    font-size: 1rem;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    background-color: #ff99cc;
-    color: white;
-    transition: background-color 0.2s;
-    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
-}
-
-.button-group button:hover,
-.ladder-start-button:hover {
-    background-color: #ff66b2;
-}
-
-/* 사다리 시작 버튼 (캔버스 위에 겹쳐짐) */
-.ladder-start-button {
-    position: absolute; /* JS에서 위치 계산 */
-    z-index: 10; /* 다른 요소 위에 표시 */
-    width: 100px; /* 고정 너비 (JS에서 중앙 정렬 시 사용) */
-    height: 40px; /* 고정 높이 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #ff66b2;
-    background-color: rgba(255, 153, 204, 0.8); /* 반투명 배경 */
-    color: #4a4a4a; /* 글자색 */
-    font-weight: bold;
-    font-size: 0.9rem; /* 모바일에서 적절한 크기 */
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-    /* 터치 반응 속도 개선 */
-    -webkit-tap-highlight-color: transparent;
-}
-
-.ladder-start-button.clicked-effect {
-    animation: buttonClickScale 0.3s forwards;
-}
-
-@keyframes buttonClickScale {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.8; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-/* 블라인드 처리 */
-.ladderCanvas.blind {
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-}
-
-/* 모바일 폰트 크기 조정 */
-@media (max-width: 600px) {
-    body {
-        font-size: 14px;
-    }
-    .button-group button,
-    .ladder-start-button {
+    .ladder-controls button {
         padding: 8px 12px;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
-    .input-section input[type="text"] {
-        font-size: 0.9rem;
+    .ladder-input-group input[type="text"], .ladder-input-group .result-display {
+        font-size: 0.8rem;
+        padding: 6px;
     }
-    /* 캔버스 시작/끝 텍스트 크기 조절 */
-    #ladderCanvas {
-        font-size: 18px; /* 캔버스 텍스트도 줄임 */
-    }
-}
-/* style.css 파일에 추가 또는 수정 */
-#ladderCanvas {
-    /* 기존 스타일 유지 */
-    display: block;
-    margin: 0 auto;
-    /* 중요: 버튼의 기준 위치가 됩니다. */
-    position: relative; 
-}
-
-.ladder-start-button {
-    position: absolute; /* 이 버튼은 이제 #ladderCanvas를 기준으로 위치합니다. */
-    z-index: 10; /* 다른 요소 위에 표시 */
-    width: 100px; /* 버튼의 너비는 고정되어야 중앙 정렬 계산이 용이합니다. */
-    height: 40px; /* 버튼의 높이는 고정되어야 중앙 정렬 계산이 용이합니다. */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #ff66b2;
-    background-color: rgba(255, 153, 204, 0.8); /* 반투명 배경 */
-    color: #4a4a4a; /* 글자색 */
-    font-weight: bold;
-    font-size: 0.9rem; /* 모바일에서 적절한 크기 */
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
-    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
-    /* 터치 반응 속도 개선 */
-    -webkit-tap-highlight-color: transparent;
 }

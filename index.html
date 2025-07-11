@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>다나 놀이터 🌈</title>
     
     <link rel="stylesheet" href="style.css">
@@ -139,31 +139,22 @@
                 <p>오늘의 한탕은 여기 사다리에 걸었다!💕</p>
 
                 <div class="ladder-controls">
-                    <button id="addInputBtn">입력 추가 +</button>
-                    <button id="removeInputBtn">입력 제거 -</button>
-                    <span class="input-count-display">입력 수: <span id="inputCount"></span></span>
-                    <button id="startGameBtn">게임 시작 ▶️</button>
-                    <button id="resetGameBtn">초기화 ↩️</button>
+                    <label for="playerCountInput">참가 인원:</label>
+                    <input type="number" id="playerCountInput" value="4" min="2" max="10">
+                    <button id="startGameBtn">사다리 시작 ▶️</button>
+                    <button id="showAllBtn" style="display: none;">전체 결과 보기 👀</button>
+                    <button id="resetGameBtn">다시 하기 ↩️</button>
                 </div>
 
-                <div class="ladder-main">
-                    <div class="ladder-sidebar">
-                        <h3>시작점</h3>
-                        <ul id="start-inputs">
-                            </ul>
+                <div class="ladder-main-container">
+                    <div id="player-inputs" class="ladder-input-group"></div>
+                    <div class="ladder-canvas-wrapper">
+                        <canvas id="ladderCanvas" width="800" height="450"></canvas>
+                        <canvas id="animationCanvas" width="800" height="450"></canvas>
                     </div>
-
-                    <div class="ladder-canvas-container">
-                        <canvas id="ladderCanvas"></canvas>
-                    </div>
-
-                    <div class="ladder-sidebar">
-                        <h3>결과값</h3>
-                        <ul id="outcomes">
-                            </ul>
-                    </div>
+                    <div id="outcome-inputs" class="ladder-input-group"></div>
+                    <div id="outcome-results" class="ladder-input-group"></div>
                 </div>
-                <p id="ladder-result"></p>
             </div>
         </section>
     </main>
