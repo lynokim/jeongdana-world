@@ -87,10 +87,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(createHeartSnow, HEART_SNOW_INTERVAL_MS);
 
     // =================================================================
-    // 사다리 게임 로직 (네이버 스타일로 재구성)
+    // 사다리 게임 로직
     // =================================================================
 
-    // DOM 요소
     const playerCountInput = document.getElementById('playerCountInput');
     const startGameBtn = document.getElementById('startGameBtn');
     const resetGameBtn = document.getElementById('resetGameBtn');
@@ -105,37 +104,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const animationCanvas = document.getElementById('animationCanvas');
     const animationCtx = animationCanvas.getContext('2d');
 
-    // 게임 상태 변수
     let playerCount = 4;
     let players = [];
     let outcomes = [];
     let shuffledOutcomes = [];
     let bridges = [];
     let gameStarted = false;
-    let resultsRevealed = []; // 각 플레이어의 결과 공개 여부 추적
+    let resultsRevealed = []; 
+    let finalDestinations = {}; // { startIndex: finalIndex }
 
-    // 상수
     const LADDER_TOP_MARGIN = 30;
     const LADDER_BOTTOM_MARGIN = 30;
     const LADDER_VERTICAL_LINE_COLOR = '#ff99cc';
     const LADDER_BRIDGE_COLOR = '#ff69b4';
-    const PATH_ANIMATION_COLOR = '#d81b60'; // 진한 핑크
-
-    // --- 초기화 및 UI 생성 ---
+    const PATH_ANIMATION_COLOR = '#d81b60';
 
     function initializeGame() {
         gameStarted = false;
         playerCount = parseInt(playerCountInput.value);
         resultsRevealed = new Array(playerCount).fill(false);
+        finalDestinations = {};
 
-        // 버튼 상태 업데이트
         startGameBtn.disabled = false;
         showAllBtn.style.display = 'none';
+        showAllBtn.disabled = false; // 버튼 다시 활성화
 
-        // 입력 필드 생성
         createInputFields(playerCount);
         
-        // 캔버스 초기화
         clearAllCanvas();
         setupCanvas();
     }
@@ -146,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
         outcomeResultsContainer.innerHTML = '';
 
         for (let i = 0; i < count; i++) {
-            // 참가자 입력 필드
             const playerWrapper = document.createElement('div');
             playerWrapper.className = 'input-wrapper';
             const playerInput = document.createElement('input');
@@ -154,12 +148,11 @@ document.addEventListener('DOMContentLoaded', () => {
             playerInput.value = `참가자 ${i + 1}`;
             playerInput.dataset.index = i;
             playerInput.className = 'player-input';
-            playerInput.readOnly = true; // 게임 시작 전에는 수정 불가, 클릭 이벤트로 핸들링
             playerInput.addEventListener('click', () => handlePlayerClick(i));
+            playerInput.addEventListener('focus', () => playerInput.select());
             playerWrapper.appendChild(playerInput);
             playerInputsContainer.appendChild(playerWrapper);
 
-            // 결과 입력 필드
             const outcomeWrapper = document.createElement('div');
             outcomeWrapper.className = 'input-wrapper';
             const outcomeInput = document.createElement('input');
@@ -167,10 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
             outcomeInput.value = `결과 ${i + 1}`;
             outcomeInput.dataset.index = i;
             outcomeInput.className = 'outcome-input';
+            outcomeInput.addEventListener('focus', () => outcomeInput.select());
             outcomeWrapper.appendChild(outcomeInput);
             outcomeInputsContainer.appendChild(outcomeWrapper);
             
-            // 결과 표시 영역
             const resultWrapper = document.createElement('div');
             resultWrapper.className = 'input-wrapper';
             const resultDisplay = document.createElement('div');
@@ -181,25 +174,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- 캔버스 설정 및 그리기 ---
-
     function setupCanvas() {
         const containerWidth = ladderCanvas.parentElement.clientWidth;
         const dpr = window.devicePixelRatio || 1;
 
-        // Ladder Canvas
-        ladderCanvas.width = containerWidth * dpr;
-        ladderCanvas.height = 450 * dpr;
-        ladderCanvas.style.width = `${containerWidth}px`;
-        ladderCanvas.style.height = `450px`;
-        ladderCtx.scale(dpr, dpr);
-        
-        // Animation Canvas
-        animationCanvas.width = containerWidth * dpr;
-        animationCanvas.height = 450 * dpr;
-        animationCanvas.style.width = `${containerWidth}px`;
-        animationCanvas.style.height = `450px`;
-        animationCtx.scale(dpr, dpr);
+        [ladderCanvas, animationCanvas].forEach(canvas => {
+            canvas.width = containerWidth * dpr;
+            canvas.height = 450 * dpr;
+            canvas.style.width = `${containerWidth}px`;
+            canvas.style.height = `450px`;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+        });
     }
     
     function clearAllCanvas() {
@@ -213,11 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const canvasHeight = ladderCanvas.clientHeight;
         const colGap = canvasWidth / (playerCount + 1);
 
-        // 세로줄 그리기
         ladderCtx.strokeStyle = LADDER_VERTICAL_LINE_COLOR;
         ladderCtx.lineWidth = 4;
         ladderCtx.lineCap = 'round';
-
         for (let i = 0; i < playerCount; i++) {
             const x = (i + 1) * colGap;
             ladderCtx.beginPath();
@@ -226,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
             ladderCtx.stroke();
         }
 
-        // 가로줄(다리) 그리기
         ladderCtx.strokeStyle = LADDER_BRIDGE_COLOR;
         ladderCtx.lineWidth = 5;
         bridges.forEach(bridge => {
@@ -239,48 +222,51 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 게임 로직 ---
-
     function startGame() {
         gameStarted = true;
         startGameBtn.disabled = true;
         showAllBtn.style.display = 'inline-block';
         
-        // 참가자 및 결과값 저장
-        players = Array.from(document.querySelectorAll('.player-input')).map(input => input.value);
-        outcomes = Array.from(document.querySelectorAll('.outcome-input')).map(input => input.value);
+        // 참가자와 결과값 저장 및 readonly 처리
+        const playerInputElements = document.querySelectorAll('.player-input');
+        const outcomeInputElements = document.querySelectorAll('.outcome-input');
         
-        // 결과 섞기
+        players = Array.from(playerInputElements).map(input => {
+            input.readOnly = true;
+            return input.value;
+        });
+        outcomes = Array.from(outcomeInputElements).map(input => {
+            input.readOnly = true;
+            return input.value;
+        });
+        
         shuffledOutcomes = [...outcomes];
         shuffleArray(shuffledOutcomes);
         
-        // 사다리 다리 생성
         generateBridges();
-        
-        // 사다리 그리기
         drawLadder();
+
+        // 모든 경로 미리 계산
+        for (let i = 0; i < playerCount; i++) {
+            finalDestinations[i] = calculatePath(i).finalIndex;
+        }
     }
 
     function generateBridges() {
         bridges = [];
         const canvasHeight = ladderCanvas.clientHeight;
         const availableHeight = canvasHeight - LADDER_TOP_MARGIN - LADDER_BOTTOM_MARGIN;
-        const numRows = playerCount * 2; // 가로줄 밀도
-        
+        const numRows = playerCount * 2;
         const rowHeight = availableHeight / numRows;
 
         for (let r = 0; r < numRows; r++) {
-            const y = LADDER_TOP_MARGIN + r * rowHeight + (Math.random() * rowHeight / 2);
-            
-            // 겹치지 않는 가로줄을 놓을 수 있는 위치 찾기
-            const availableCols = [...Array(playerCount - 1).keys()];
-            shuffleArray(availableCols);
-            
-            for (const c of availableCols) {
-                // 현재 행에 이미 연결된 다리가 있는지 확인
-                const isOccupied = bridges.some(b => b.y === y && (b.c1 === c || b.c2 === c || b.c1 === c -1 || b.c2 === c + 1));
-                if (!isOccupied && Math.random() < 0.5) { // 50% 확률로 다리 놓기
+            const placedInRow = [];
+            for (let c = 0; c < playerCount - 1; c++) {
+                if (placedInRow.includes(c)) continue;
+                if (Math.random() < 0.5) {
+                    const y = LADDER_TOP_MARGIN + r * rowHeight + (Math.random() * rowHeight * 0.6 + rowHeight * 0.2);
                     bridges.push({ c1: c, c2: c + 1, y: y });
+                    placedInRow.push(c, c + 1); // 인접한 라인에는 다리 놓지 않음
                 }
             }
         }
@@ -300,30 +286,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const colGap = canvasWidth / (playerCount + 1);
         
         let currentCol = startIndex;
-        let currentY = LADDER_TOP_MARGIN;
+        let currentY = 0;
         
-        const pathPoints = [{ x: (startIndex + 1) * colGap, y: 0 }];
-        pathPoints.push({ x: (startIndex + 1) * colGap, y: LADDER_TOP_MARGIN });
+        const pathPoints = [{ x: (startIndex + 1) * colGap, y: currentY }];
+        
+        const relevantBridges = bridges.filter(b => b.y > currentY);
 
-        const relevantBridges = bridges.filter(b => b.c1 === currentCol || b.c2 === currentCol);
-
-        for(const bridge of bridges) {
-            if (bridge.y < currentY) continue;
-            
-            if (bridge.c1 === currentCol) { // 오른쪽으로 이동
+        for(const bridge of relevantBridges) {
+            if (bridge.c1 === currentCol || bridge.c2 === currentCol) {
                 pathPoints.push({ x: (currentCol + 1) * colGap, y: bridge.y });
-                pathPoints.push({ x: (currentCol + 2) * colGap, y: bridge.y });
-                currentCol++;
-                currentY = bridge.y;
-            } else if (bridge.c2 === currentCol) { // 왼쪽으로 이동
+                if(bridge.c1 === currentCol){
+                    currentCol++;
+                } else {
+                    currentCol--;
+                }
                 pathPoints.push({ x: (currentCol + 1) * colGap, y: bridge.y });
-                pathPoints.push({ x: (currentCol) * colGap, y: bridge.y });
-                currentCol--;
-                currentY = bridge.y;
             }
         }
         
-        pathPoints.push({ x: (currentCol + 1) * colGap, y: canvasHeight - LADDER_BOTTOM_MARGIN });
         pathPoints.push({ x: (currentCol + 1) * colGap, y: canvasHeight });
         
         return { path: pathPoints, finalIndex: currentCol };
@@ -332,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function animatePath(path, onComplete) {
         let currentPoint = 0;
         let progress = 0;
-        const speed = 5; // 애니메이션 속도
+        const speed = 8;
 
         function animate() {
             if (currentPoint >= path.length - 1) {
@@ -353,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const currentX = start.x + dx * ratio;
                 const currentY = start.y + dy * ratio;
-
+                
                 animationCtx.strokeStyle = PATH_ANIMATION_COLOR;
                 animationCtx.lineWidth = 5;
                 animationCtx.lineCap = 'round';
@@ -376,73 +356,107 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function showResult(playerIndex, finalIndex) {
-        if(resultsRevealed[playerIndex]) return; // 이미 공개된 결과는 무시
+        if(resultsRevealed[playerIndex]) return;
 
         resultsRevealed[playerIndex] = true;
         
         const resultDisplays = document.querySelectorAll('.result-display');
         const playerInputs = document.querySelectorAll('.player-input');
+        const outcomeInputs = document.querySelectorAll('.outcome-input');
         
         resultDisplays[finalIndex].textContent = shuffledOutcomes[finalIndex];
         resultDisplays[finalIndex].classList.add('visible');
         
-        // 연결된 플레이어와 결과 하이라이트
-        playerInputs[playerIndex].style.backgroundColor = '#ffecf2';
-        document.querySelectorAll('.outcome-input')[finalIndex].style.backgroundColor = '#ffecf2';
-
-        // 모든 결과가 공개되었는지 확인
-        if (resultsRevealed.every(r => r === true)) {
-            showAllBtn.disabled = true;
-        }
+        playerInputs[playerIndex].classList.add('highlight');
+        outcomeInputs[finalIndex].classList.add('highlight');
     }
-
-
-    // --- 이벤트 핸들러 ---
 
     function handlePlayerClick(index) {
         if (!gameStarted) {
             alert('먼저 "사다리 시작" 버튼을 눌러주세요! 😊');
             return;
         }
-        if (resultsRevealed[index]) return; // 이미 경로를 확인한 경우
+        if (resultsRevealed[index]) return;
 
         const { path, finalIndex } = calculatePath(index);
         animatePath(path, () => showResult(index, finalIndex));
     }
     
     playerCountInput.addEventListener('change', initializeGame);
-
     startGameBtn.addEventListener('click', startGame);
-
-    resetGameBtn.addEventListener('click', () => {
-        // 입력 필드 초기화 (사용자가 입력한 값 유지하지 않음)
-        playerCountInput.value = 4;
-        initializeGame();
-    });
+    resetGameBtn.addEventListener('click', initializeGame);
 
     showAllBtn.addEventListener('click', () => {
         if (!gameStarted) return;
-        animationCtx.clearRect(0, 0, animationCanvas.width, animationCanvas.height); // 기존 애니메이션 클리어
+
+        const popupWidth = 400;
+        const popupHeight = 450;
+        const left = (screen.width / 2) - (popupWidth / 2);
+        const top = (screen.height / 2) - (popupHeight / 2);
+
+        const resultPopup = window.open('', 'resultPopup', `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes`);
         
+        let popupContent = `
+            <html>
+            <head>
+                <title>💖 전체 결과 💖</title>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500&display=swap');
+                    body { 
+                        font-family: 'Noto Sans KR', sans-serif; 
+                        background: linear-gradient(135deg, #fff0f5 0%, #ffdde1 100%); 
+                        padding: 20px; 
+                        text-align: center; 
+                        color: #4a4a4a;
+                    }
+                    h3 { 
+                        font-family: 'Jua', sans-serif; 
+                        color: #d81b60; 
+                        font-size: 24px;
+                        margin-bottom: 20px;
+                    }
+                    ul { 
+                        list-style: none; 
+                        padding: 0;
+                        margin: 0;
+                    }
+                    li { 
+                        background: rgba(255, 255, 255, 0.7);
+                        margin-bottom: 10px; 
+                        padding: 12px; 
+                        border-radius: 12px; 
+                        font-size: 16px; 
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        gap: 15px;
+                    }
+                    strong { color: #d81b60; }
+                    span { font-weight: 500; color: #ff69b4; }
+                </style>
+            </head>
+            <body>
+                <h3>💖 전체 결과 💖</h3>
+                <ul>
+        `;
+
         for (let i = 0; i < playerCount; i++) {
-            const { path, finalIndex } = calculatePath(i);
-            
-            animationCtx.strokeStyle = PATH_ANIMATION_COLOR;
-            animationCtx.globalAlpha = 0.7; // 전체 결과는 약간 투명하게
-            animationCtx.lineWidth = 5;
-            animationCtx.lineCap = 'round';
-            
-            animationCtx.beginPath();
-            animationCtx.moveTo(path[0].x, path[0].y);
-            for (let p = 1; p < path.length; p++) {
-                animationCtx.lineTo(path[p].x, path[p].y);
-            }
-            animationCtx.stroke();
-            
-            showResult(i, finalIndex);
+            const finalIndex = finalDestinations[i];
+            const playerName = players[i];
+            const resultName = shuffledOutcomes[finalIndex];
+            popupContent += `<li><strong>${playerName}</strong> &Rightarrow; <span>${resultName}</span></li>`;
         }
-        animationCtx.globalAlpha = 1.0;
-        showAllBtn.disabled = true;
+
+        popupContent += `
+                </ul>
+            </body>
+            </html>
+        `;
+
+        resultPopup.document.open();
+        resultPopup.document.write(popupContent);
+        resultPopup.document.close();
     });
 
     window.addEventListener('resize', () => {
@@ -452,6 +466,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- 초기 실행 ---
     initializeGame();
 });
